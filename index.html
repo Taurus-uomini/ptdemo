@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="src-min/ace.js"></script>
+        <script type="text/javascript" src="src-min/ext-language_tools.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function()
+            {
+                ace.require("ace/ext/language_tools");
+                var editor = ace.edit("editor");
+                editor.session.setMode("ace/mode/php");
+                editor.setTheme("ace/theme/twilight");
+                editor.setValue("<?php \n \n ?>");
+                editor.gotoLine(2);
+                editor.setOptions(
+                {
+                    enableBasicAutocompletion: true,
+                    enableSnippets: true,
+                    enableLiveAutocompletion: true
+                });
+                $('#la').change(function()
+                {
+                    var la=$(this).val();
+                    editor.session.setMode("ace/mode/"+la);
+                    if(la=='php')
+                    {
+                        editor.setValue("<?php \n \n ?>");
+                        editor.gotoLine(2);
+                    }
+                    else if(la=='c_cpp')
+                    {
+                        editor.setValue("#include<stdio.h> \nint main(void) \n{\n \n}");
+                        editor.gotoLine(4);
+                    }
+                    else if(la=='java')
+                    {
+                        editor.setValue("public class code\n{\n\tpublic static void main(String args[])\n\t{\n\n\t}\n}");
+                        editor.gotoLine(5);
+                    }
+                });
+                $('#run').click(function()
+                {
+                    var code=editor.getValue();
+                    var la=$('#la').val();
+                    $.post("runcode.php", { "code": code,'la': la },
+                    function(data){
+                        $('.right').empty();
+                        $('.right').append(data);
+                    });
+                    });
+            });
+        </script>
+        <style type="text/css">
+            #la
+            {
+                display: block;
+            }
+            .main
+            {
+                height: 300px;
+            }
+            .left
+            {
+                float: left;
+                width: 50%;
+                height: 100%;
+            }
+            #editor
+            {
+                height: 100%;
+            }
+            .right
+            {
+                float: left;
+                width: 50%;
+                height: 100%;
+            }
+            .botter
+            {
+                margin-top: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+            <select id="la">
+                <option value="php">php</option>
+                <option value="c_cpp">c</option>
+                <option value="java">java</option>
+            </select>
+            <div class="left">
+                <pre id="editor"></pre>
+            </div> 
+            <div class="right">
+            
+            </div> 
+        </div>
+        <div class="botter">
+            <button type="button" id="run">运行</button>
+        </div>
+    </body>
+</html>
